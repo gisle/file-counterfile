@@ -8,7 +8,7 @@ use strict;
 
 use Carp   qw(croak);
 use Symbol qw(gensym);
-use Fcntl qw(O_RDWR O_CREAT);
+use Fcntl qw(LOCK_EX SEEK_SET O_RDWR O_CREAT);
 
 use vars qw($VERSION $MAGIC $DEFAULT_INITIAL $DEFAULT_DIR);
 
@@ -41,7 +41,7 @@ sub new
     local($/, $\) = ("\n", undef);
     local *F;
     sysopen(F, $file, O_RDWR|O_CREAT) or croak("Can't open $file: $!");
-    flock(F, 2) or croak("Can't flock: $!");
+    flock(F, LOCK_EX) or croak("Can't flock: $!");
     my $first_line = <F>;
     if (defined $first_line) {
 	croak "Bad counter magic '$first_line' in $file" unless $first_line eq $MAGIC;
@@ -49,7 +49,7 @@ sub new
 	chomp($value);
     }
     else {
-	seek(F, 0, 0);
+	seek(F, 0, SEEK_SET);
 	print F $MAGIC;
 	print F "$initial\n";
 	$value = $initial;
@@ -79,7 +79,7 @@ sub lock
     my $file = $self->{file};
 
     open($fh, "+<$file") or croak "Can't open $file: $!";
-    flock($fh, 2) or croak "Can't flock: $!";  # 2 = exlusive lock
+    flock($fh, LOCK_EX) or croak "Can't flock: $!";  # 2 = exlusive lock
 
     local($/) = "\n";
     my $magic = <$fh>;
@@ -105,7 +105,7 @@ sub unlock
     if ($self->{updated}) {
 	# write back new value
 	local($\) = undef;
-	seek($fh, 0, 0) or croak "Can't seek to beginning: $!";
+	seek($fh, 0, SEEK_SET) or croak "Can't seek to beginning: $!";
 	print $fh $MAGIC;
 	print $fh "$self->{'value'}\n";
     }
