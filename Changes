@@ -1,3 +1,13 @@
+2002-07-30   Gisle Aas <gisle@activestate.com>
+
+   Release 1.00
+
+   Fix possible race condition if multiple processes tries to create
+   the counter file at the same time.  Based on patch from
+   Philipp Gühring <p.guehring@futureware.at>.
+
+
+
 1998-06-09   Gisle Aas <aas@sn.no>
 
    Release 0.12
