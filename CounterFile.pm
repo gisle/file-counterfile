@@ -63,14 +63,10 @@ and you can interpolate counters diretly into strings.
 It uses flock(2) to lock the counter file.  This does not work on all
 systems.  Perhaps we should use the File::Lock module?
 
-=head1 INSTALLATION
-
-Copy this file to the F<File> subdirectory of your Perl 5 library
-directory (often F</usr/local/lib/perl5>).
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1996 Gisle Aas. All rights reserved.
+Copyright (c) 1995-1998 Gisle Aas. All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
