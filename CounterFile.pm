@@ -1,94 +1,22 @@
-# This -*-perl -*- module implements a persistent counter class.
-#
-# $Id$
-#
-
 package File::CounterFile;
 
+# $Id$
 
-=head1 NAME
-
-File::CounterFile - Persistent counter class
-
-=head1 SYNOPSIS
-
- use File::CounterFile;
- $c = new File::CounterFile "COUNTER", "aa00";
-
- $id = $c->inc;
- open(F, ">F$id");
-
-=head1 DESCRIPTION
-
-This module implements a persistent counter class.  Each counter is
-represented by a separate file in the file system.  File locking is
-applied, so multiple processes might try to access the same counters
-at the same time without risk of counter destruction.
-
-You give the file name as the first parameter to the object
-constructor (C<new>).  The file is created if it does not exist.
-
-If the file name does not start with "/" or ".", then it is
-interpreted as a file relative to C<$File::CounterFile::DEFAULT_DIR>.
-The default value for this variable is initialized from the
-environment variable C<TMPDIR>, or F</usr/tmp> is no environment
-variable is defined.  You may want to assign a different value to this
-variable before creating counters.
-
-If you pass a second parameter to the constructor, that sets the
-initial value for a new counter.  This parameter only takes effect
-when the file is created (i.e. it does not exist before the call).
-
-When you call the C<inc()> method, you increment the counter value by
-one. When you call C<dec()> the counter value is decrementd.  In both
-cases the new value is returned.  The C<dec()> method only works for
-numerical counters (digits only).
-
-You can peek at the value of the counter (without incrementing it) by
-using the C<value()> method.
-
-The counter can be locked and unlocked with the C<lock()> and
-C<unlock()> methods.  Incrementing and value retrieval is faster when
-the counter is locked, because we do not have to update the counter
-file all the time.  You can query whether the counter is locked with
-the C<locked()> method.
-
-There is also an operator overloading interface to the
-File::CounterFile object.  This means that you might use the C<++>
-operator for incrementing the counter, C<--> operator for decrementing
-and you can interpolate counters diretly into strings.
-
-=head1 BUGS
-
-It uses flock(2) to lock the counter file.  This does not work on all
-systems.  Perhaps we should use the File::Lock module?
-
-
-=head1 COPYRIGHT
-
-Copyright (c) 1995-1998 Gisle Aas. All rights reserved.
-
-This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-Gisle Aas <aas@sn.no>
-
-=cut
+use strict;
+use vars qw($VERSION $MAGIC $DEFAULT_INITIAL $DEFAULT_DIR);
 
 require 5.002;
 use Carp   qw(croak);
 use Symbol qw(gensym);
 
 sub Version { $VERSION; }
-$VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
+$VERSION = "0.13";
 
-$MAGIC           = "#COUNTER-1.0\n";   # first line in counter files
+$MAGIC = "#COUNTER-1.0\n";             # first line in counter files
 $DEFAULT_INITIAL = 0;                  # default initial counter value
 
  # default location for counter files
-$DEFAULT_DIR     = $ENV{TMPDIR} || "/usr/tmp";
+$DEFAULT_DIR = $ENV{TMPDIR} || "/usr/tmp";
 
 # Experimental overloading.
 use overload ('++'     => \&inc,
@@ -116,7 +44,8 @@ sub new
 	close(F);
 	croak "Bad counter magic '$first_line' in $file" unless $first_line eq $MAGIC;
 	chomp($value);
-    } else {
+    }
+    else {
 	open(F, ">$file") or croak "Can't create $file: $!";
 	print F $MAGIC;
 	print F "$initial\n";
@@ -210,7 +139,8 @@ sub dec
 	    unless $self->{'value'} =~ /^\d+$/;
 	$self->{'value'}--;
 	$self->{updated} = 1;
-    } else {
+    }
+    else {
 	$self->lock;
 	croak "Autodecrement is not magical in perl"
 	    unless $self->{'value'} =~ /^\d+$/;
@@ -228,7 +158,8 @@ sub value
     my $value;
     if ($self->locked) {
 	$value = $self->{'value'};
-    } else {
+    }
+    else {
 	$self->lock;
 	$value = $self->{'value'};
 	$self->unlock;
@@ -244,3 +175,76 @@ sub DESTROY
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+File::CounterFile - Persistent counter class
+
+=head1 SYNOPSIS
+
+ use File::CounterFile;
+ $c = new File::CounterFile "COUNTER", "aa00";
+
+ $id = $c->inc;
+ open(F, ">F$id");
+
+=head1 DESCRIPTION
+
+This module implements a persistent counter class.  Each counter is
+represented by a separate file in the file system.  File locking is
+applied, so multiple processes might try to access the same counters
+at the same time without risk of counter destruction.
+
+You give the file name as the first parameter to the object
+constructor (C<new>).  The file is created if it does not exist.
+
+If the file name does not start with "/" or ".", then it is
+interpreted as a file relative to C<$File::CounterFile::DEFAULT_DIR>.
+The default value for this variable is initialized from the
+environment variable C<TMPDIR>, or F</usr/tmp> is no environment
+variable is defined.  You may want to assign a different value to this
+variable before creating counters.
+
+If you pass a second parameter to the constructor, that sets the
+initial value for a new counter.  This parameter only takes effect
+when the file is created (i.e. it does not exist before the call).
+
+When you call the C<inc()> method, you increment the counter value by
+one. When you call C<dec()> the counter value is decrementd.  In both
+cases the new value is returned.  The C<dec()> method only works for
+numerical counters (digits only).
+
+You can peek at the value of the counter (without incrementing it) by
+using the C<value()> method.
+
+The counter can be locked and unlocked with the C<lock()> and
+C<unlock()> methods.  Incrementing and value retrieval is faster when
+the counter is locked, because we do not have to update the counter
+file all the time.  You can query whether the counter is locked with
+the C<locked()> method.
+
+There is also an operator overloading interface to the
+File::CounterFile object.  This means that you might use the C<++>
+operator for incrementing the counter, C<--> operator for decrementing
+and you can interpolate counters diretly into strings.
+
+=head1 BUGS
+
+It uses flock(2) to lock the counter file.  This does not work on all
+systems.  Perhaps we should use the File::Lock module?
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 1995-1998,2002 Gisle Aas. All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Gisle Aas <gisle@aas.no>
+
+=cut
