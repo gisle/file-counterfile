@@ -1,3 +1,9 @@
+1998-06-09   Gisle Aas <aas@sn.no>
+
+   Release 0.12
+
+
+
 1998-05-16   Gisle Aas <aas@sn.no>
 
    Fix problem with 'Ambiguous use of {value} resolved to {"value"}' warnings
