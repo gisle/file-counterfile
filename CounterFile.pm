@@ -2,15 +2,18 @@ package File::CounterFile;
 
 # $Id$
 
-use strict;
-use vars qw($VERSION $MAGIC $DEFAULT_INITIAL $DEFAULT_DIR);
+require 5.004;
 
-require 5.002;
+use strict;
+
 use Carp   qw(croak);
 use Symbol qw(gensym);
+use Fcntl qw(O_RDWR O_CREAT);
+
+use vars qw($VERSION $MAGIC $DEFAULT_INITIAL $DEFAULT_DIR);
 
 sub Version { $VERSION; }
-$VERSION = "0.13";
+$VERSION = "1.00";
 
 $MAGIC = "#COUNTER-1.0\n";             # first line in counter files
 $DEFAULT_INITIAL = 0;                  # default initial counter value
@@ -29,29 +32,28 @@ use overload ('++'     => \&inc,
 sub new
 {
     my($class, $file, $initial) = @_;
-    croak "No file specified\n" unless defined $file;
+    croak("No file specified\n") unless defined $file;
 
     $file = "$DEFAULT_DIR/$file" unless $file =~ /^[\.\/]/;
     $initial = $DEFAULT_INITIAL unless defined $initial;
 
-    local($/, $\) = ("\n", undef);
     my $value;
-    if (-e $file) {
-	croak "Specified file is a directory" if -d _;
-	open(F, $file) or croak "Can't open $file: $!";
-	my $first_line = <F>;
-	$value = <F>;
-	close(F);
+    local($/, $\) = ("\n", undef);
+    local *F;
+    sysopen(F, $file, O_RDWR|O_CREAT) or croak("Can't open $file: $!");
+    flock(F, 2) or croak("Can't flock: $!");
+    my $first_line = <F>;
+    if (defined $first_line) {
 	croak "Bad counter magic '$first_line' in $file" unless $first_line eq $MAGIC;
+	$value = <F>;
 	chomp($value);
     }
     else {
-	open(F, ">$file") or croak "Can't create $file: $!";
 	print F $MAGIC;
 	print F "$initial\n";
-	close(F);
 	$value = $initial;
     }
+    close(F) || croak("Can't close $file: $!");
 
     bless { file    => $file,  # the filename for the counter
 	   'value'  => $value, # the current value
@@ -185,7 +187,7 @@ File::CounterFile - Persistent counter class
 =head1 SYNOPSIS
 
  use File::CounterFile;
- $c = new File::CounterFile "COUNTER", "aa00";
+ $c = File::CounterFile->new("COUNTER", "aa00");
 
  $id = $c->inc;
  open(F, ">F$id");
@@ -229,12 +231,6 @@ There is also an operator overloading interface to the
 File::CounterFile object.  This means that you might use the C<++>
 operator for incrementing the counter, C<--> operator for decrementing
 and you can interpolate counters diretly into strings.
-
-=head1 BUGS
-
-It uses flock(2) to lock the counter file.  This does not work on all
-systems.  Perhaps we should use the File::Lock module?
-
 
 =head1 COPYRIGHT
 
