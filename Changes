@@ -1,3 +1,18 @@
+2003-10-06   Gisle Aas <gisle@activestate.com>
+
+   Release 1.01
+
+   Various fixes by Jan Dubois to make the module work better on Windows.
+
+        - Unlock the file before croak()ing in dec() method
+        - seek() after reading to EOF.  Otherwise we cannot write (on Windows)
+        - unlink() counterfile at the beginning of tests to protect against
+          leftovers from previous failures
+        - test for fork() availability in race.t
+        - warn on failed unlink() because Windows will not unlink open files
+
+
+
 2002-07-30   Gisle Aas <gisle@activestate.com>
 
    Release 1.00
