@@ -1,3 +1,10 @@
+1998-05-16   Gisle Aas <aas@sn.no>
+
+   Fix problem with 'Ambiguous use of {value} resolved to {"value"}' warnings
+   when the module is reloaded.
+
+
+
 1998-03-25   Gisle Aas <aas@sn.no>
 
    Release 0.11, unbundled from libwww-perl-5.22.
