@@ -114,10 +114,11 @@ sub new
     if (-e $file) {
 	croak "Specified file is a directory" if -d _;
 	open(F, $file) or croak "Can't open $file: $!";
+	local($/) = "\n";
 	my $first_line = <F>;
 	$value = <F>;
 	close(F);
-	croak "Bad counter magic in $file" unless $first_line eq $MAGIC;
+	croak "Bad counter magic '$first_line' in $file" unless $first_line eq $MAGIC;
 	chomp($value);
     } else {
 	open(F, ">$file") or croak "Can't create $file: $!";
@@ -152,6 +153,7 @@ sub lock
     open($fh, "+<$file") or croak "Can't open $file: $!";
     flock($fh, 2) or croak "Can't flock: $!";  # 2 = exlusive lock
 
+    local($/) = "\n";
     my $magic = <$fh>;
     if ($magic ne $MAGIC) {
 	$self->unlock;
