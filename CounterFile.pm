@@ -70,19 +70,20 @@ directory (often F</usr/local/lib/perl5>).
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995 Gisle Aas. All rights reserved.
+Copyright (c) 1995-1996 Gisle Aas. All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Gisle Aas <aas@oslonett.no>
+Gisle Aas <aas@sn.no>
 
 =cut
 
-
-use Carp;
+require 5.002;
+use Carp   qw(croak);
+use Symbol qw(gensym);
 
 sub Version { $VERSION; }
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
@@ -145,7 +146,7 @@ sub lock
     my($self) = @_;
     $self->unlock if $self->locked;
 
-    my $fh = _gensym();
+    my $fh = gensym();
     my $file = $self->{file};
 
     open($fh, "+<$file") or croak "Can't open $file: $!";
@@ -179,7 +180,6 @@ sub unlock
     }
 
     close($fh) or warn "Can't close: $!";
-    _ungensym($self->{handle});
     delete $self->{handle};
     $self;
 }
@@ -243,24 +243,6 @@ sub DESTROY
     my $self = shift;
     $self->unlock;
 }
-
-# Borrowed from POSIX.pm
-# It should actually be in FileHandle.pm, so we could use it from there.
-
-$gensym = 'COUNTER000';
-
-sub _gensym
-{
-    'File::CounterFile::' . $gensym++;
-}
-
-sub _ungensym
-{
-    local($x) = shift;
-    $x =~ s/.*:://;                   # lose package name
-    delete $File::CounterFile::{$x};  # delete from package symbol table
-}
-
 
 ####################################################################
 #
