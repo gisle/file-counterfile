@@ -97,7 +97,7 @@ $DEFAULT_DIR     = $ENV{TMPDIR} || "/usr/tmp";
 # Experimental overloading.
 %OVERLOAD = ('++'     => \&inc,
 	     '--'     => \&dec,
- 	     '""'     => \&value,
+	     '""'     => \&value,
 	     fallback => 1,
 );
 
