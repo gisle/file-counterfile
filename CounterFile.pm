@@ -125,7 +125,7 @@ sub new
     }
 
     bless { file    => $file,  # the filename for the counter
-	    value   => $value, # the current value
+	   'value'  => $value, # the current value
 	    updated => 0,      # flag indicating if value has changed
 	    # handle => XXX,   # file handle symbol. Only present when locked
 	  };
@@ -155,7 +155,7 @@ sub lock
 	$self->unlock;
 	croak("Bad counter magic '$magic' in $file");
     }
-    chomp($self->{value} = <$fh>);
+    chomp($self->{'value'} = <$fh>);
 
     $self->{handle}  = $fh;
     $self->{updated} = 0;
@@ -175,7 +175,7 @@ sub unlock
 	local($\) = undef;
 	seek($fh, 0, 0) or croak "Can't seek to beginning: $!";
 	print $fh $MAGIC;
-	print $fh "$self->{value}\n";
+	print $fh "$self->{'value'}\n";
     }
 
     close($fh) or warn "Can't close: $!";
@@ -189,15 +189,15 @@ sub inc
     my($self) = @_;
 
     if ($self->locked) {
-	$self->{value}++;
+	$self->{'value'}++;
 	$self->{updated} = 1;
     } else {
 	$self->lock;
-	$self->{value}++;
+	$self->{'value'}++;
 	$self->{updated} = 1;
 	$self->unlock;
     }
-    $self->{value}; # return value
+    $self->{'value'}; # return value
 }
 
 
@@ -207,18 +207,18 @@ sub dec
 
     if ($self->locked) {
 	croak "Autodecrement is not magical in perl"
-	    unless $self->{value} =~ /^\d+$/;
-	$self->{value}--;
+	    unless $self->{'value'} =~ /^\d+$/;
+	$self->{'value'}--;
 	$self->{updated} = 1;
     } else {
 	$self->lock;
 	croak "Autodecrement is not magical in perl"
-	    unless $self->{value} =~ /^\d+$/;
-	$self->{value}--;
+	    unless $self->{'value'} =~ /^\d+$/;
+	$self->{'value'}--;
 	$self->{updated} = 1;
 	$self->unlock;
     }
-    $self->{value}; # return value
+    $self->{'value'}; # return value
 }
 
 
@@ -227,10 +227,10 @@ sub value
     my($self) = @_;
     my $value;
     if ($self->locked) {
-	$value = $self->{value};
+	$value = $self->{'value'};
     } else {
 	$self->lock;
-	$value = $self->{value};
+	$value = $self->{'value'};
 	$self->unlock;
     }
     $value;
