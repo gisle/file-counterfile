@@ -18,6 +18,8 @@ use File::CounterFile;
 my $counter = "./zz-counter-$$";
 unlink($counter);
 
+$| = 1;
+
 my $num_rounds = 100;
 my $num_kids = 10;
 my $num_incs = 10;
