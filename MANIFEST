@@ -3,3 +3,4 @@ CounterFile.pm
 MANIFEST
 Makefile.PL
 README
+t/basic.t
