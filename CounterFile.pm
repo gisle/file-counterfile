@@ -201,8 +201,8 @@ File::CounterFile - Persistent counter class
 
 This module implements a persistent counter class.  Each counter is
 represented by a separate file in the file system.  File locking is
-applied, so multiple processes might try to access the same counters
-at the same time without risk of counter destruction.
+applied, so multiple processes can attempt to access a counter
+simultaneously without risk of counter destruction.
 
 You give the file name as the first parameter to the object
 constructor (C<new>).  The file is created if it does not exist.
@@ -210,16 +210,16 @@ constructor (C<new>).  The file is created if it does not exist.
 If the file name does not start with "/" or ".", then it is
 interpreted as a file relative to C<$File::CounterFile::DEFAULT_DIR>.
 The default value for this variable is initialized from the
-environment variable C<TMPDIR>, or F</usr/tmp> is no environment
+environment variable C<TMPDIR>, or F</usr/tmp> if no environment
 variable is defined.  You may want to assign a different value to this
 variable before creating counters.
 
-If you pass a second parameter to the constructor, that sets the
+If you pass a second parameter to the constructor, it sets the
 initial value for a new counter.  This parameter only takes effect
 when the file is created (i.e. it does not exist before the call).
 
 When you call the C<inc()> method, you increment the counter value by
-one. When you call C<dec()> the counter value is decrementd.  In both
+one. When you call C<dec()>, the counter value is decremented.  In both
 cases the new value is returned.  The C<dec()> method only works for
 numerical counters (digits only).
 
@@ -227,15 +227,15 @@ You can peek at the value of the counter (without incrementing it) by
 using the C<value()> method.
 
 The counter can be locked and unlocked with the C<lock()> and
-C<unlock()> methods.  Incrementing and value retrieval is faster when
+C<unlock()> methods.  Incrementing and value retrieval are faster when
 the counter is locked, because we do not have to update the counter
 file all the time.  You can query whether the counter is locked with
 the C<locked()> method.
 
 There is also an operator overloading interface to the
-File::CounterFile object.  This means that you might use the C<++>
-operator for incrementing the counter, C<--> operator for decrementing
-and you can interpolate counters diretly into strings.
+File::CounterFile object.  This means that you can use the C<++>
+operator for incrementing and the C<--> operator for decrementing the counter,
+and you can interpolate counters directly into strings.
 
 =head1 COPYRIGHT
 
