@@ -95,11 +95,11 @@ $DEFAULT_INITIAL = 0;                  # default initial counter value
 $DEFAULT_DIR     = $ENV{TMPDIR} || "/usr/tmp";
 
 # Experimental overloading.
-%OVERLOAD = ('++'     => \&inc,
-	     '--'     => \&dec,
-	     '""'     => \&value,
-	     fallback => 1,
-);
+use overload ('++'     => \&inc,
+	      '--'     => \&dec,
+	      '""'     => \&value,
+	      fallback => 1,
+             );
 
 
 sub new
@@ -110,11 +110,11 @@ sub new
     $file = "$DEFAULT_DIR/$file" unless $file =~ /^[\.\/]/;
     $initial = $DEFAULT_INITIAL unless defined $initial;
 
+    local($/, $\) = ("\n", undef);
     my $value;
     if (-e $file) {
 	croak "Specified file is a directory" if -d _;
 	open(F, $file) or croak "Can't open $file: $!";
-	local($/) = "\n";
 	my $first_line = <F>;
 	$value = <F>;
 	close(F);
@@ -123,7 +123,7 @@ sub new
     } else {
 	open(F, ">$file") or croak "Can't create $file: $!";
 	print F $MAGIC;
-	print F $initial, "\n";
+	print F "$initial\n";
 	close(F);
 	$value = $initial;
     }
@@ -176,6 +176,7 @@ sub unlock
 
     if ($self->{updated}) {
 	# write back new value
+	local($\) = undef;
 	seek($fh, 0, 0) or croak "Can't seek to beginning: $!";
 	print $fh $MAGIC;
 	print $fh "$self->{value}\n";
