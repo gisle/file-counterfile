@@ -239,7 +239,7 @@ and you can interpolate counters diretly into strings.
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1998,2002 Gisle Aas. All rights reserved.
+Copyright (c) 1995-1998,2002,2003 Gisle Aas. All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
