@@ -49,6 +49,7 @@ sub new
 	chomp($value);
     }
     else {
+	seek(F, 0, 0);
 	print F $MAGIC;
 	print F "$initial\n";
 	$value = $initial;
@@ -137,15 +138,19 @@ sub dec
     my($self) = @_;
 
     if ($self->locked) {
-	croak "Autodecrement is not magical in perl"
-	    unless $self->{'value'} =~ /^\d+$/;
+	unless ($self->{'value'} =~ /^\d+$/) {
+	    $self->unlock;
+	    croak "Autodecrement is not magical in perl";
+	}
 	$self->{'value'}--;
 	$self->{updated} = 1;
     }
     else {
 	$self->lock;
-	croak "Autodecrement is not magical in perl"
-	    unless $self->{'value'} =~ /^\d+$/;
+	unless ($self->{'value'} =~ /^\d+$/) {
+	    $self->unlock;
+	    croak "Autodecrement is not magical in perl";
+	}
 	$self->{'value'}--;
 	$self->{updated} = 1;
 	$self->unlock;

@@ -9,6 +9,7 @@ my $cf = "./zz-counter-$$";  # the name for out temprary counter
 
 # Test normal object creation and increment
 
+unlink $cf;
 my $c = new File::CounterFile $cf;
 
 my $id1 = $c->inc;
@@ -19,7 +20,7 @@ my $id3 = $c->inc;
 my $id4 = $c->dec;
 
 die "test failed" unless ($id1 == 1 && $id2 == 2 && $id3 == 3 && $id4 == 2);
-unlink $cf;
+unlink $cf or die "Can't unlink $cf: $!";
 
 # Test magic increment
 
@@ -36,7 +37,7 @@ die "test failed (No exception to catch)" unless $@;
 #print "$id1 $id2 $id3\n";
 
 die "test failed" unless ($id1 eq "aa99" && $id2 eq "ab00" && $id3 eq "ab01");
-unlink $cf;
+unlink $cf or die "Can't unlink $cf: $!";
 
 # Test operator overloading
 
