@@ -13,7 +13,7 @@ use Fcntl qw(O_RDWR O_CREAT);
 use vars qw($VERSION $MAGIC $DEFAULT_INITIAL $DEFAULT_DIR);
 
 sub Version { $VERSION; }
-$VERSION = "1.01";
+$VERSION = "1.02";
 
 $MAGIC = "#COUNTER-1.0\n";             # first line in counter files
 $DEFAULT_INITIAL = 0;                  # default initial counter value

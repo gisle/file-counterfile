@@ -1,3 +1,13 @@
+2003-10-21   Gisle Aas <gisle@activestate.com>
+
+   Release 1.02
+
+   Gurusamy Sarathy found that the 'race' test failed on platforms
+   which don't manage to autoflush before fork.  The workaround
+   applied is to enable perl level autoflush in that test script.
+
+
+
 2003-10-06   Gisle Aas <gisle@activestate.com>
 
    Release 1.01
